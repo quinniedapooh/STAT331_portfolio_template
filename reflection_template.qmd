@@ -22,6 +22,10 @@ execute:
 
 ```{r}
 #| label: wd-1-csv-1
+# Week 3 Lab 3 Question 2
+
+evals <- read_csv(here::here("Week 3", "Lab 3", "teacher_evals.csv"))
+
 
 ```
 
@@ -29,6 +33,13 @@ execute:
 
 ```{r}
 #| label: wd-1-csv-2
+# Week 4 Lab 4 Question 0
+
+childcare_costs <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-05-09/childcare_costs.csv')
+
+counties <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-05-09/counties.csv')
+
+tax_rev <- read_csv('https://atheobold.github.io/groupworthy-data-science/labs/instructions/data/ca_tax_revenue.csv') 
 
 ```
 
@@ -520,7 +531,7 @@ The following assignments satisfy the above criteria:
 
 ```
 
-## Data Simulation & Statisical Models
+## Data Simulation & Statistical Models
 
 **DSSM-1: I can simulate data from a *variety* of probability models.**
 
