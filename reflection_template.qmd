@@ -573,6 +573,8 @@ One of the biggest points that I've learned from Professor Theobold's feedback i
 
 <!-- How did you extended your thinking throughout the course? How did you extend your thinking on the code examples you have provided in your portfolio? -->
 
+When learning to extend my thinking, I focused on how I could apply my past feedback from labs and challenges into future projects.
+
 ## Peer Support & Collaboration
 
 <!-- Include an image or a description of feedback you gave that you are proud of (either in a peer review or in Discord). -->
