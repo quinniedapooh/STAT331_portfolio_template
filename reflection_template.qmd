@@ -10,7 +10,7 @@ execute:
   echo: true
 ---
 
-[**My Grade:**]{.underline} I believe my grade equivalent to course work evidenced below to be an \_\_.
+[**My Grade:**]{.underline} I believe my grade equivalent to course work evidenced below to be an \_C\_.
 
 [**Learning Objective Evidence:**]{.underline} In the code chunks below, provide code from Lab or Challenge assignments where you believe you have demonstrated proficiency with the specified learning target. Be sure to specify **where** the code came from (e.g., Lab 4 Question 2).
 
@@ -47,6 +47,14 @@ tax_rev <- read_csv('https://atheobold.github.io/groupworthy-data-science/labs/i
 
 ```{r}
 #| label: wd-1-xlsx
+# PA 4 Question 1
+
+military <- read_xlsx("gov_spending_per_capita.xlsx",
+                      sheet = "Share of Govt. spending",
+                      skip  = 7,
+                      n_max = 190,
+                      na = c("..", ". .", "xxx")
+                      )
 
 ```
 
@@ -56,7 +64,23 @@ tax_rev <- read_csv('https://atheobold.github.io/groupworthy-data-science/labs/i
 
 ```{r}
 #| label: wd-2-ex-1
+# Lab 3 Question 5
 
+teacher_evals_clean <- evals |>
+  rename(sex = gender) |>
+  filter(no_participants >= 10) |>
+  mutate(teacher_id = as.character(teacher_id),
+         course_id = as.character(course_id)) |>
+  select(course_id,
+         teacher_id,
+         question_no,
+         no_participants,
+         resp_share,
+         SET_score_avg,
+         percent_failed_cur,
+         academic_degree,
+         seniority,
+         sex)
 ```
 
 -   Example removing specified columns
@@ -64,12 +88,16 @@ tax_rev <- read_csv('https://atheobold.github.io/groupworthy-data-science/labs/i
 ```{r}
 #| label: wd-2-ex-2
 
+
+
 ```
 
 -   Example selecting columns based on logical values (e.g., `starts_with()`, `ends_with()`, `contains()`, `where()`)
 
 ```{r}
 #| label: wd-2-ex-3
+
+
 
 ```
 
@@ -79,6 +107,23 @@ tax_rev <- read_csv('https://atheobold.github.io/groupworthy-data-science/labs/i
 
 ```{r}
 #| label: wd-3-numeric-ex-1
+# Lab 3 Question 5
+
+teacher_evals_clean <- evals |>
+  rename(sex = gender) |>
+  filter(no_participants >= 10) |>
+  mutate(teacher_id = as.character(teacher_id),
+         course_id = as.character(course_id)) |>
+  select(course_id,
+         teacher_id,
+         question_no,
+         no_participants,
+         resp_share,
+         SET_score_avg,
+         percent_failed_cur,
+         academic_degree,
+         seniority,
+         sex)
 
 ```
 
@@ -86,6 +131,18 @@ tax_rev <- read_csv('https://atheobold.github.io/groupworthy-data-science/labs/i
 
 ```{r}
 #| label: wd-3-numeric-ex-1
+# Lab 4 Question 5
+
+median_household_income <- ca_childcare |>
+  filter(study_year %in% c(2008, 2018)) |>
+  group_by(region, study_year) |>
+  summarize(median_income = median(mhi_2018, na.rm = TRUE), .groups = "drop") |>
+  pivot_wider(
+    names_from = study_year,
+    names_prefix = "median_income_",
+    values_from = median_income
+  ) |>
+  arrange(desc("median_income_2018"))
 
 ```
 
@@ -93,13 +150,29 @@ tax_rev <- read_csv('https://atheobold.github.io/groupworthy-data-science/labs/i
 
 ```{r}
 #| label: wd-3-character
+# Lab 3 Question 12
 
+teacher_evals_clean |>
+  filter(academic_degree %in% c("dr", "prof")) |>  
+  group_by(teacher_id, seniority, sex) |>                       
+  summarise(avg_resp = mean(resp_share, na.rm = TRUE), .groups = "drop") |> 
+  filter(avg_resp == max(avg_resp) | 
+           avg_resp == min(avg_resp))
 ```
 
 -   Character Example 2 (example must use functions from **stringr**)
 
 ```{r}
 #| label: wd-3-string
+# Lab 3 Question 10
+
+teacher_evals_clean |>
+  filter(question_no == 901) |>
+  group_by(teacher_id) |>
+  filter(n_distinct(course_id) >= 5) |>
+  summarise(avg_q1_rating = mean(SET_score_avg, na.rm = TRUE)) |>
+  filter(avg_q1_rating == max(avg_q1_rating) | 
+           avg_q1_rating == min(avg_q1_rating))
 
 ```
 
@@ -107,6 +180,10 @@ tax_rev <- read_csv('https://atheobold.github.io/groupworthy-data-science/labs/i
 
 ```{r}
 #| label: wd-3-date
+# Lab 4 
+
+get_fit_now_check_in |>
+  filter(check_in_date == "20180109")
 
 ```
 
@@ -130,6 +207,19 @@ tax_rev <- read_csv('https://atheobold.github.io/groupworthy-data-science/labs/i
 
 ```{r}
 #| label: wd-4-factor-ex-1
+# Challenge 3 Question 1
+
+teacher_evals_comp_ratings <- evals |>
+  filter(question_no == 903) |>                                         
+  mutate(
+    set_level = if_else(SET_score_avg >= 4, "excellent", "standard"), 
+    sen_level = case_when(                                           
+      seniority <= 4 ~ "junior",
+      seniority >= 5 & seniority <= 8 ~ "senior",
+      seniority > 8 ~ "very senior"
+    )
+  ) |>
+  select(course_id, set_level, sen_level)   
 
 ```
 
@@ -137,6 +227,23 @@ tax_rev <- read_csv('https://atheobold.github.io/groupworthy-data-science/labs/i
 
 ```{r}
 #| label: wd-4-factor-ex-2
+# Lab 4 Question 7
+ca_childcare_pivot_long <- ca_childcare |>
+  select(region, 
+         study_year,
+         mc_infant,
+         mc_toddler,
+         mc_preschool) |>
+  pivot_longer(cols = c(mc_infant, mc_toddler, mc_preschool),
+              names_to = "age_group",
+              values_to = "price") |>
+  mutate(age_group = recode(age_group,
+          "mc_infant" = "Infant",
+          "mc_toddler" = "Toddler",
+          "mc_preschool" = "Preschool"),
+        age_group = fct_reorder(.f = age_group, .x = price, .fun = median, .desc = TRUE),
+        region = fct_reorder2(region, study_year, price)
+  )
 
 ```
 
@@ -213,6 +320,25 @@ tax_rev <- read_csv('https://atheobold.github.io/groupworthy-data-science/labs/i
 
 ```{r}
 #| label: wd-7-long
+# Lab 4 Question 7
+
+ca_childcare_pivot_long <- ca_childcare |>
+  select(region, 
+         study_year,
+         mc_infant,
+         mc_toddler,
+         mc_preschool) |>
+  pivot_longer(cols = c(mc_infant, mc_toddler, mc_preschool),
+              names_to = "age_group",
+              values_to = "price") |>
+  mutate(age_group = recode(age_group,
+          "mc_infant" = "Infant",
+          "mc_toddler" = "Toddler",
+          "mc_preschool" = "Preschool"),
+        age_group = fct_reorder(.f = age_group, .x = price, .fun = median, .desc = TRUE),
+        region = fct_reorder2(region, study_year, price)
+  )
+
 
 ```
 
@@ -241,13 +367,46 @@ The following assignments satisfy the above criteria:
 
 ```{r}
 #| label: r-2-1
+# Challenge 3 Question 2
 
+ggplot(data = teacher_evals_comp_ratings,
+       mapping = aes(
+         x = sen_level,
+         fill = set_level
+       )) +
+  geom_bar(position = "fill") +
+  scale_y_continuous(labels = scales::label_percent) + #https://www.geeksforgeeks.org/r-language/change-y-axis-to-percentage-points-in-ggplot2-barplot-in-r/
+  labs(
+    title = "Evaluation of Teachers' Use of Activites",
+    x = "Years of Experience",
+    y= "",
+    fill = "Evaluation Rating"
+  ) +
+  theme_bw() +
+  theme(
+    legend.position = "top" #https://www.datanovia.com/en/blog/ggplot-legend-title-position-and-labels/#change-legend-position
+
+  )
 ```
 
 -   Example of **dplyr** pipeline
 
 ```{r}
 #| label: r-2-2
+# Challenge 3 Question 2
+
+teacher_evals_comp_ratings <- evals |>
+  filter(question_no == 903) |>                                         
+  mutate(
+    set_level = if_else(SET_score_avg >= 4, "excellent", "standard"), 
+    sen_level = case_when(                                           
+      seniority <= 4 ~ "junior",
+      seniority >= 5 & seniority <= 8 ~ "senior",
+      seniority > 8 ~ "very senior"
+    )
+  ) |>
+  select(course_id, set_level, sen_level)   
+
 
 ```
 
@@ -282,13 +441,46 @@ The following assignments satisfy the above criteria:
 
 ```{r}
 #| label: dvs-1-num
+# Lab 2 Question 4
 
+ggplot(data = surveys,
+       mapping = aes(
+         x = weight,
+         y= hindfoot_length)) +
+  geom_point(alpha = 0.25) +
+  facet_wrap(~species) +
+  labs(x = "Weight (g)",
+       y="",
+       title = "Comparison of Weight & Hindfoot Length for Rodent Species in the Portal Project",
+       subtitle = "Hindfoot Length (mm)"
+  ) +
+  theme_bw()
 ```
 
 -   At least one numeric variable and one categorical variable
 
 ```{r}
 #| label: dvs-2-num-cat
+# Challenge 3 Question 2
+
+ggplot(data = teacher_evals_comp_ratings,
+       mapping = aes(
+         x = sen_level,
+         fill = set_level
+       )) +
+  geom_bar(position = "fill") +
+  scale_y_continuous(labels = scales::label_percent) + #https://www.geeksforgeeks.org/r-language/change-y-axis-to-percentage-points-in-ggplot2-barplot-in-r/
+  labs(
+    title = "Evaluation of Teachers' Use of Activites",
+    x = "Years of Experience",
+    y= "",
+    fill = "Evaluation Rating"
+  ) +
+  theme_bw() +
+  theme(
+    legend.position = "top" #https://www.datanovia.com/en/blog/ggplot-legend-title-position-and-labels/#change-legend-position
+
+  )
 
 ```
 
@@ -312,6 +504,20 @@ The following assignments satisfy the above criteria:
 
 ```{r}
 #| label: dvs-2-ex-1
+# Lab 2 Question 4
+
+ggplot(data = surveys,
+       mapping = aes(
+         x = weight,
+         y= hindfoot_length)) +
+  geom_point(alpha = 0.25) +
+  facet_wrap(~species) +
+  labs(x = "Weight (g)",
+       y="",
+       title = "Comparison of Weight & Hindfoot Length for Rodent Species in the Portal Project",
+       subtitle = "Hindfoot Length (mm)"
+  ) +
+  theme_bw()
 
 ```
 
@@ -326,6 +532,20 @@ The following assignments satisfy the above criteria:
 
 ```{r}
 #| label: dvs-2-ex-3
+# Lab 2 Question 4
+
+ggplot(data = surveys,
+       mapping = aes(
+         x = weight,
+         y= hindfoot_length)) +
+  geom_point(alpha = 0.25) +
+  facet_wrap(~species) +
+  labs(x = "Weight (g)",
+       y="",
+       title = "Comparison of Weight & Hindfoot Length for Rodent Species in the Portal Project",
+       subtitle = "Hindfoot Length (mm)"
+  ) +
+  theme_bw()
 
 ```
 
@@ -340,6 +560,24 @@ The following assignments satisfy the above criteria:
 
 ```{r}
 #| label: dvs-2-ex-5
+# Lab 4 Question 7
+
+ca_childcare_pivot_long <- ca_childcare |>
+  select(region, 
+         study_year,
+         mc_infant,
+         mc_toddler,
+         mc_preschool) |>
+  pivot_longer(cols = c(mc_infant, mc_toddler, mc_preschool),
+              names_to = "age_group",
+              values_to = "price") |>
+  mutate(age_group = recode(age_group,
+          "mc_infant" = "Infant",
+          "mc_toddler" = "Toddler",
+          "mc_preschool" = "Preschool"),
+        age_group = fct_reorder(.f = age_group, .x = price, .fun = median, .desc = TRUE),
+        region = fct_reorder2(region, study_year, price)
+  )
 
 ```
 
@@ -349,6 +587,22 @@ The following assignments satisfy the above criteria:
 
 ```{r}
 #| label: dvs-3-1-ex-1
+# Challenge 2 Question 3
+
+ggplot(data = penguins, 
+       mapping = aes(x = bill_length_mm, y = species, color = island)
+       ) +
+  geom_boxplot() +
+  scale_color_manual(values = untitled_red) +
+  labs(x = "Bill Length (mm)", 
+       y = "", 
+       title = "Length of Different Penguin Species' Bills", 
+       subtitle = "Separated by <span style = 'color:#c8251d;'>Biscoe</span>, <span style = 'color:#a11b26;'>Dream</span> and <span style = 'color:#ef6552;'>Torgenson</span> Islands") +
+  theme(
+    legend.position = "none", 
+    plot.subtitle = element_markdown()
+    ) +
+  theme_bw()
 
 ```
 
@@ -356,6 +610,26 @@ The following assignments satisfy the above criteria:
 
 ```{r}
 #| label: dvs-3-1-ex-2
+# Challenge 3 Question 2 
+
+ggplot(data = teacher_evals_comp_ratings,
+       mapping = aes(
+         x = sen_level,
+         fill = set_level
+       )) +
+  geom_bar(position = "fill") +
+  scale_y_continuous(labels = scales::label_percent) + #https://www.geeksforgeeks.org/r-language/change-y-axis-to-percentage-points-in-ggplot2-barplot-in-r/
+  labs(
+    title = "Evaluation of Teachers' Use of Activites",
+    x = "Years of Experience",
+    y= "",
+    fill = "Evaluation Rating"
+  ) +
+  theme_bw() +
+  theme(
+    legend.position = "top" #https://www.datanovia.com/en/blog/ggplot-legend-title-position-and-labels/#change-legend-position
+
+  )
 
 ```
 
@@ -379,6 +653,13 @@ The following assignments satisfy the above criteria:
 
 ```{r}
 #| label: dvs-4-summarize
+# Lab 3 Question 9
+
+teacher_evals_clean |>
+  group_by(teacher_id, course_id) |>
+  summarize(num_questions = n_distinct(question_no), .groups = 'drop') |>
+  filter(num_questions == 9) |>
+  nrow()
 
 ```
 
@@ -411,7 +692,18 @@ The following assignments satisfy the above criteria:
 
 ```{r}
 #| label: dvs-6-ex-1
+# Lab 4 Question 5
 
+median_household_income <- ca_childcare |>
+  filter(study_year %in% c(2008, 2018)) |>
+  group_by(region, study_year) |>
+  summarize(median_income = median(mhi_2018, na.rm = TRUE), .groups = "drop") |>
+  pivot_wider(
+    names_from = study_year,
+    names_prefix = "median_income_",
+    values_from = median_income
+  ) |>
+  arrange(desc("median_income_2018"))
 ```
 
 -   I can modify the text in my table to be more readable (e.g., bold face for column headers)
@@ -425,6 +717,18 @@ The following assignments satisfy the above criteria:
 
 ```{r}
 #| label: dvs-6-ex-3
+# Lab 4 Question 5
+
+median_household_income <- ca_childcare |>
+  filter(study_year %in% c(2008, 2018)) |>
+  group_by(region, study_year) |>
+  summarize(median_income = median(mhi_2018, na.rm = TRUE), .groups = "drop") |>
+  pivot_wider(
+    names_from = study_year,
+    names_prefix = "median_income_",
+    values_from = median_income
+  ) |>
+  arrange(desc("median_income_2018"))
 
 ```
 
@@ -434,6 +738,26 @@ The following assignments satisfy the above criteria:
 
 ```{r}
 #| label: dvs-7-ex-1
+# Challenge 2 Question 2
+
+ggplot(data = surveys,
+       mapping = aes(
+         x = weight,
+         y = species,
+         fill = sex)) +
+  geom_jitter(width = 0.25, 
+              alpha = 0.025,
+              color = "deepskyblue") + #https://www.nceas.ucsb.edu/sites/default/files/2020-04/colorPaletteCheatsheet.pdf
+  geom_boxplot(outliers=FALSE) +
+  scale_fill_brewer(palette="Accent") +#https://ggplot2.tidyverse.org/reference/scale_brewer.html
+  labs(
+    x = "Weight (g)",
+    y = "Species of Rodent",
+    title = "Distribution of Weight within Rodent Species in the Portal Project",
+    fill = "Sex of Rodent") +
+  theme_bw() +
+  theme(axis.text.y = element_text(angle=45))
+
 
 ```
 
@@ -441,6 +765,20 @@ The following assignments satisfy the above criteria:
 
 ```{r}
 #| label: dvs-7-ex-2
+# Lab 4 Question 5
+
+median_household_income <- ca_childcare |>
+  filter(study_year %in% c(2008, 2018)) |>
+  group_by(region, study_year) |>
+  summarize(median_income = median(mhi_2018, na.rm = TRUE), .groups = "drop") |>
+  pivot_wider(
+    names_from = study_year,
+    names_prefix = "median_income_",
+    values_from = median_income
+  ) |>
+  arrange(desc("median_income_2018"))
+
+
 
 ```
 
@@ -452,6 +790,21 @@ The following assignments satisfy the above criteria:
 
 ```{r}
 #| label: pe-1-one-call
+# Lab 4 Question 4
+
+ca_childcare <- ca_childcare |> 
+  mutate(county_name = str_remove(county_name, " County"),
+    region = fct_collapse(county_name,
+      "Superior" = superior_counties,
+      "North Coast" = north_coast_counties,
+      "San Francisco Bay Area" = san_fran_counties,
+      "North San Joaquin Valley" = n_san_joaquin_counties,
+      "Central Coast" = central_coast_counties,
+      "South San Joaquin Valley" = s_san_joaquin_counties,
+      "Inland Empire" = inland_counties,
+      "Los Angeles" = la_county,
+      "Orange County" = orange_county,
+      "San Diego & Imperial" = san_diego_imperial_counties))
 
 ```
 
@@ -521,6 +874,26 @@ The following assignments satisfy the above criteria:
 
 ```{r}
 #| label: pe-4-1
+# Challenge 3 Question 2 
+
+ggplot(data = teacher_evals_comp_ratings,
+       mapping = aes(
+         x = sen_level,
+         fill = set_level
+       )) +
+  geom_bar(position = "fill") +
+  scale_y_continuous(labels = scales::label_percent) + #https://www.geeksforgeeks.org/r-language/change-y-axis-to-percentage-points-in-ggplot2-barplot-in-r/
+  labs(
+    title = "Evaluation of Teachers' Use of Activites",
+    x = "Years of Experience",
+    y= "",
+    fill = "Evaluation Rating"
+  ) +
+  theme_bw() +
+  theme(
+    legend.position = "top" #https://www.datanovia.com/en/blog/ggplot-legend-title-position-and-labels/#change-legend-position
+
+  )
 
 ```
 
@@ -555,6 +928,12 @@ The following assignments satisfy the above criteria:
 
 ```{r}
 #| label: dsm-2-1
+# Challenge 3 Question 3
+
+teacher_evals_comp_ratings |>
+  select(set_level, sen_level) |>               
+  table() |>                                    
+  chisq.test()
 
 ```
 
@@ -562,6 +941,10 @@ The following assignments satisfy the above criteria:
 
 ```{r}
 #| label: dsm-2-2
+# Lab 4 Question 9
+
+reg_mod1 <- lm(mc_infant ~ mhi_2018, data = ca_childcare)
+summary(reg_mod1)
 
 ```
 
@@ -569,6 +952,9 @@ The following assignments satisfy the above criteria:
 
 ```{r}
 #| label: dsm-2-3
+# Lab 1 Question 9
+
+t.test(len ~ supp, data = ToothGrowth, alternative = "two.sided", var.equal = FALSE)
 
 ```
 
@@ -584,10 +970,14 @@ One of the biggest points that I've learned from Professor Theobold's feedback i
 
 <!-- How did you extended your thinking throughout the course? How did you extend your thinking on the code examples you have provided in your portfolio? -->
 
-When learning to extend my thinking, I focused on how I could apply my past feedback from labs and challenges into future projects.
+When learning to extend my thinking, I focused on how I could apply my past feedback from labs and challenges into future projects. Although I would sometimes forget about previous feedback noted, I tried to repeatedly implement feedback when possible.
 
 ## Peer Support & Collaboration
 
 <!-- Include an image or a description of feedback you gave that you are proud of (either in a peer review or in Discord). -->
 
+Here is a peer review I'm proud of: For starters, you've done a great job with consistent indenting and new lines for each layer, which made your document really easy to read. You've also used named arguments for all your code, which further adds to the readability of your work. The only suggestion I have is to consider separating out arguments for lines that have many of them on new lines, like you've done for the labels, so that the arguments are easier to distinguish. But overall, your code is very clear and readable!
+
 <!-- Include a description of how you grew as a collaborator through the weekly pair programming activities.   -->
+
+One of the biggest things I've learned through peer programming is being able to adapt to different viewpoints, as there are many times when my my approach to solving a problem would be different than someone else.
