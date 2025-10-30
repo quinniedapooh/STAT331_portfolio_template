@@ -1,6 +1,6 @@
 ---
 title: "STAT 331 Portfolio"
-author: "Quinton Wong"
+author: "Quinton Wong Edited"
 format: html 
 embed-resources: true
 layout: margin-left
